@@ -20,7 +20,6 @@ $result = $conn->query($sql);
             <th>Klassenavn</th>
             <th>Studiumkode</th>
         </tr>
-
         <?php
         if ($result->num_rows > 0) {
             // viser rad for rad
