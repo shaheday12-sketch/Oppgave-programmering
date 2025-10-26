@@ -18,4 +18,4 @@
         <li><a href="slett_student.php">Slett student</a></li>
     </ul>
 </body>
-</html>
+</html>     
