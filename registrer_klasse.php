@@ -1,31 +1,39 @@
 <?php
-require_once __DIR__ . '/db.php';
-$message = '';
+require 'db.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $kode = trim($_POST['klassekode']);
-    $navn = trim($_POST['klassenavn']);
-    $studium = trim($_POST['studiumkode']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $klassekode = $_POST['klassekode'];
+    $klassenavn = $_POST['klassenavn'];
+    $studiumkode = $_POST['studiumkode'];
 
-    if ($kode && $navn && $studium) {
-        $stmt = $conn->prepare("INSERT INTO klasse (klassekode, klassenavn, studiumkode) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $kode, $navn, $studium);
-        if ($stmt->execute()) {
-            $message = "✅ Klassen ble registrert!";
-        } else {
-            $message = "Feil ved registrering.";
-        }
+    $sql = "INSERT INTO klasse (klassekode, klassenavn, studiumkode) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $klassekode, $klassenavn, $studiumkode);
+
+    if ($stmt->execute()) {
+        echo "<p>Klasse registrert!</p>";
     } else {
-        $message = "Fyll ut alle felt.";
+        echo "<p>Feil ved registrering: " . $conn->error . "</p>";
     }
 }
 ?>
-<h2>Registrer ny klasse</h2>
-<form method="post">
-  <p style="color:green;"><?php echo $message; ?></p>
-  Klassekode: <input type="text" name="klassekode" required><br>
-  Klassenavn: <input type="text" name="klassenavn" required><br>
-  Studiumkode: <input type="text" name="studiumkode" required><br>
-  <input type="submit" value="Lagre">
-</form>
-<a href="index.php">⬅ Tilbake</a>
+
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrer klasse</title>
+</head>
+<body>
+    <h1>Registrer klasse</h1>
+    <form method="POST">
+        <label>Klassekode: <input type="text" name="klassekode" required></label><br>
+        <label>Klassenavn: <input type="text" name="klassenavn" required></label><br>
+        <label>Studiumkode: <input type="text" name="studiumkode" required></label><br>
+        <button type="submit">Lagre</button>
+    </form>
+
+    <p><a href="index.php">Tilbake</a></p>
+</body>
+</html>
+
