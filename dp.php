@@ -1,3 +1,5 @@
+
+Du har sendt
 <?php
 $host = "b-studentsql-1.usn.no";
 $db   = "shayo1243";
