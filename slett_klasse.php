@@ -1,6 +1,8 @@
 <?php
-require_once _DIR_ . '/db.php';
-
+require_once __DIR__ . '/db.php';
+if (!defined('__DIR__')) {
+    define('__DIR__', dirname(__FILE__));
+}
 $msg = null; $err = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

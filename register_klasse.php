@@ -26,15 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!doctype html>
-<html lang="no"><head><meta charset="utf-8"><title>Registrer klasse</title><link rel="stylesheet" href="style.css"></head>
+<html lang="no"><head><meta charset="utf-8"><title>Registrer klasse</title></head>
 <body>
 <h1>Registrer klasse</h1>
-<?php if ($msg): ?><p class="ok"><?= htmlspecialchars($msg) ?></p><?php endif; ?>
-<?php if ($err): ?><p class="err"><?= htmlspecialchars($err) ?></p><?php endif; ?>
-<form method="post" class="form">
-  <label>Klassekode (max 5): <input name="klassekode" maxlength="5" required></label>
-  <label>Klassenavn: <input name="klassenavn" required></label>
-  <label>Studiumkode: <input name="studiumkode" required></label>
+<?php if ($msg): ?><p style="color:green"><?= htmlspecialchars($msg) ?></p><?php endif; ?>
+<?php if ($err): ?><p style="color:red"><?= htmlspecialchars($err) ?></p><?php endif; ?>
+<form method="post">
+  <label>Klassekode (max 5): <input name="klassekode" maxlength="5" required></label><br>
+  <label>Klassenavn: <input name="klassenavn" required></label><br>
+  <label>Studiumkode: <input name="studiumkode" required></label><br>
   <button type="submit">Lagre</button>
 </form>
 <p><a href="index.php">Tilbake</a></p>
