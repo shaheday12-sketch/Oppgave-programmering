@@ -1,31 +1,43 @@
 <?php
-require_once __DIR__ . '/db.php';
-$message = '';
+require_once _DIR_ . '/db.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $kode = trim($_POST['klassekode']);
-    $navn = trim($_POST['klassenavn']);
-    $studium = trim($_POST['studiumkode']);
+$msg = null; $err = null;
 
-    if ($kode && $navn && $studium) {
-        $stmt = $conn->prepare("INSERT INTO klasse (klassekode, klassenavn, studiumkode) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $kode, $navn, $studium);
-        if ($stmt->execute()) {
-            $message = "✅ Klassen ble registrert!";
-        } else {
-            $message = "Feil ved registrering.";
-        }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $klassekode = trim($_POST['klassekode'] ?? '');
+    $klassenavn = trim($_POST['klassenavn'] ?? '');
+    $studiumkode = trim($_POST['studiumkode'] ?? '');
+
+    if ($klassekode === '' || $klassenavn === '' || $studiumkode === '') {
+        $err = "Alle felter må fylles ut.";
+    } elseif (mb_strlen($klassekode) > 5) {
+        $err = "Klassekode kan maks være 5 tegn.";
     } else {
-        $message = "Fyll ut alle felt.";
+        $stmt = $conn->prepare("INSERT INTO klasse (klassekode, klassenavn, studiumkode) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $klassekode, $klassenavn, $studiumkode);
+        try {
+            $stmt->execute();
+            $msg = "Klasse registrert.";
+        } catch (mysqli_sql_exception $e) {
+            $err = ($conn->errno == 1062) ? "Klassekoden finnes allerede." : "Feil ved lagring: " . htmlspecialchars($e->getMessage());
+        }
+        $stmt->close();
     }
 }
 ?>
-<h2>Registrer ny klasse</h2>
+<!doctype html>
+<html lang="no"><head><meta charset="utf-8"><title>Registrer klasse</title></head>
+<body>
+<h1>Registrer klasse</h1>
+<?php if ($msg): ?><p style="color:green"><?= htmlspecialchars($msg) ?></p><?php endif; ?>
+<?php if ($err): ?><p style="color:red"><?= htmlspecialchars($err) ?></p><?php endif; ?>
 <form method="post">
-  <p style="color:green;"><?php echo $message; ?></p>
-  Klassekode: <input type="text" name="klassekode" required><br>
-  Klassenavn: <input type="text" name="klassenavn" required><br>
-  Studiumkode: <input type="text" name="studiumkode" required><br>
-  <input type="submit" value="Lagre">
+  <label>Klassekode (max 5): <input name="klassekode" maxlength="5" required></label><br>
+  <label>Klassenavn: <input name="klassenavn" required></label><br>
+  <label>Studiumkode: <input name="studiumkode" required></label><br>
+  <button type="submit">Lagre</button>
 </form>
-<a href="index.php">⬅ Tilbake</a>
+<p><a href="index.php">Tilbake</a></p>
+</body></html>
+Sendt
+Skriv til
