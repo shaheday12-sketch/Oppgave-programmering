@@ -1,6 +1,6 @@
 <?php
 // Inkluder tilkoblingen – endre sti hvis dp.php ligger et annet sted
-require_once _DIR_ . '/dp.php';
+require_once __DIR__ . '/dp.php';
 
 $message = '';
 $is_ok    = false;
