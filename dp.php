@@ -5,7 +5,7 @@ $user = "shayo1243";
 $pass = "5791shayo1243";
 
 // Koble til databasen
-$conn = new mysqil($host, $suser, $pass, $db);
+$conn = new mysqli($host, $suser, $pass, $db);
 
 // Sjekk om tilkoblingen fungerer
 if ($conn->connect_error) {
