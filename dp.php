@@ -1,10 +1,8 @@
-
-Du har sendt
 <?php
 $host = "b-studentsql-1.usn.no";
-$db   = "shayo1243";
-$user = "shayo1243";
-$pass = "5791shayo1243";
+$user = "shayo1243";      // brukernavnet ditt
+$pass = "5791shayo1243";  // skriv inn passordet ditt her
+$db   = "shayo1243";      // databasenavn (samme som brukernavnet ditt)
 
 // Koble til databasen
 $conn = new mysqli($host, $user, $pass, $db);
@@ -14,7 +12,7 @@ if ($conn->connect_error) {
     die("Tilkoblingsfeil: " . $conn->connect_error);
 }
 
-// Sett korrekt tegnsett
+// Sett korrekt tegnsett (valgfritt, men anbefalt)
 $conn->set_charset('utf8mb4');
 
 // Hvis du vil teste at alt virker:
