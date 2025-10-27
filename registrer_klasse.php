@@ -1,5 +1,13 @@
 <?php
+<<<<<<< HEAD
 require 'db.php';
+=======
+// Inkluder tilkoblingen – endre sti hvis dp.php ligger et annet sted
+require_once __DIR__ . '/dp.php';
+
+$message = '';
+$is_ok    = false;
+>>>>>>> 7609f7f4220fcde6c2c4bbbf7a800ce27a852e6e
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $klassekode = $_POST['klassekode'];
@@ -36,4 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p><a href="index.php">Tilbake</a></p>
 </body>
 </html>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7609f7f4220fcde6c2c4bbbf7a800ce27a852e6e
