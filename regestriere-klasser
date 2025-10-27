@@ -1,6 +1,7 @@
-<?php include 'db.php'; ?>
+<?php include 'db_connect.php'; ?> 
 
 <h2>Registrer ny klasse</h2>
+
 <form method="post">
   Klassekode: <input type="text" name="klassekode"><br>
   Klassenavn: <input type="text" name="klassenavn"><br>
@@ -14,11 +15,16 @@ if (isset($_POST['lagre'])) {
   $navn = $_POST['klassenavn'];
   $studium = $_POST['studiumkode'];
 
-  $sql = "INSERT INTO klasse VALUES ('$kode', '$navn', '$studium')";
+  // Sett inn i databasen
+  $sql = "INSERT INTO klasse (klassekode, klassenavn, studiumkode)
+          VALUES ('$kode', '$navn', '$studium')";
+
   if ($conn->query($sql)) {
     echo "✅ Klassen ble registrert!";
   } else {
     echo "❌ Feil: " . $conn->error;
   }
 }
+
+$conn->close(); // <-- Viktig: Lukk forbindelsen etterpå
 ?>
