@@ -1,5 +1,5 @@
 <?php
-require_once _DIR_ . '/db.php';
+require_once __DIR__ . '/db.php';
 $res = $conn->query("SELECT klassekode, klassenavn, studiumkode FROM klasse ORDER BY klassekode");
 ?>
 <!doctype html>
