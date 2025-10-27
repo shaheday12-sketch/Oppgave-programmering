@@ -39,5 +39,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </form>
 <p><a href="index.php">Tilbake</a></p>
 </body></html>
-Sendt
-Skriv til
