@@ -1,5 +1,5 @@
 <?php
-require_once _DIR_ . '/db.php';
+require_once DIR . '/db.php';
 
 $msg = null; $err = null;
 
