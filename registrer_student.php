@@ -1,23 +1,48 @@
 <?php
-// Forsøk å finne db.php i flere vanlige steder
-$possible_paths = [
-    __DIR__ . '/db.php',        // Samme mappe som denne filen
-    __DIR__ . '/../db.php',     // Ett nivå opp
-    __DIR__ . '/../../db.php',  // To nivå opp
-];
+// Inkluder databasekoblingen
+include __DIR__ . '/db.php'; // Juster stien hvis db.php ligger i en undermappe
 
-$db_found = false;
-
-foreach ($possible_paths as $path) {
-    if (file_exists($path)) {
-        require $path;
-        $db_found = true;
-        break;
-    }
+// Hent alle klasser
+try {
+    $klasser = $pdo->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode")->fetchAll();
+} catch (PDOException $e) {
+    die("Kunne ikke hente klasser: " . $e->getMessage());
 }
 
-if (!$db_found) {
-    die("Feil: db.php ble ikke funnet i noen av de vanlige plasseringene.");
+// Håndter skjema-innsending
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $brukernavn = trim($_POST['brukernavn']);
+    $fornavn = trim($_POST['fornavn']);
+    $etternavn = trim($_POST['etternavn']);
+    $klassekode = $_POST['klassekode'];
+
+    $errors = [];
+
+    // Validering
+    if (!preg_match('/^[a-z]{1,7}$/', $brukernavn)) {
+        $errors[] = "Brukernavn må være 1–7 små bokstaver.";
+    }
+    if (empty($fornavn) || empty($etternavn)) {
+        $errors[] = "Fornavn og etternavn er påkrevd.";
+    }
+    if (empty($klassekode)) {
+        $errors[] = "Du må velge en klasse.";
+    }
+
+    // Sett inn i databasen hvis ingen feil
+    if (empty($errors)) {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO student (brukernavn, fornavn, etternavn, klassekode) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$brukernavn, $fornavn, $etternavn, $klassekode]);
+            $success = "Student registrert!";
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                $errors[] = "Brukernavn finnes allerede eller klasse finnes ikke.";
+            } else {
+                $errors[] = "Feil: " . $e->getMessage();
+            }
+        }
+    }
 }
 ?>
 
@@ -34,38 +59,10 @@ if (!$db_found) {
         <a href="../index.php">← Tilbake</a>
 
         <?php
-        $klasser = $pdo->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode")->fetchAll();
-
-        if ($_POST) {
-            $brukernavn = trim($_POST['brukernavn']);
-            $fornavn = trim($_POST['fornavn']);
-            $etternavn = trim($_POST['etternavn']);
-            $klassekode = $_POST['klassekode'];
-
-            $errors = [];
-
-            if (!preg_match('/^[a-z]{1,7}$/', $brukernavn)) {
-                $errors[] = "Brukernavn må være 1–7 små bokstaver.";
-            }
-            if (empty($fornavn) || empty($etternavn)) {
-                $errors[] = "Fornavn og etternavn er påkrevd.";
-            }
-
-            if (empty($errors)) {
-                try {
-                    $stmt = $pdo->prepare("INSERT INTO student (brukernavn, fornavn, etternavn, klassekode) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([$brukernavn, $fornavn, $etternavn, $klassekode]);
-                    echo "<p class='success'>Student registrert!</p>";
-                } catch (PDOException $e) {
-                    if ($e->getCode() == 23000) {
-                        echo "<p class='error'>Brukernavn finnes allerede eller klasse finnes ikke.</p>";
-                    } else {
-                        echo "<p class='error'>Feil: " . $e->getMessage() . "</p>";
-                    }
-                }
-            } else {
-                foreach ($errors as $e) echo "<p class='error'>$e</p>";
-            }
+        // Vis meldinger
+        if (!empty($success)) echo "<p class='success'>$success</p>";
+        if (!empty($errors)) {
+            foreach ($errors as $e) echo "<p class='error'>$e</p>";
         }
         ?>
 
@@ -83,7 +80,9 @@ if (!$db_found) {
             <select name="klassekode" required>
                 <option value="">-- Velg klasse --</option>
                 <?php foreach ($klasser as $k): ?>
-                    <option value="<?= $k['klassekode'] ?>"><?= $k['klassekode'] ?> - <?= $k['klassenavn'] ?></option>
+                    <option value="<?= htmlspecialchars($k['klassekode']) ?>">
+                        <?= htmlspecialchars($k['klassekode']) ?> - <?= htmlspecialchars($k['klassenavn']) ?>
+                    </option>
                 <?php endforeach; ?>
             </select>
 
