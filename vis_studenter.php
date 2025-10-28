@@ -21,13 +21,9 @@
         $studenter = $stmt->fetchAll();
         ?>
 
-        <?php if (count($studenter) > 0): ?>
+        <?php if ($studenter): ?>
             <table>
-                <tr>
-                    <th>Brukernavn</th>
-                    <th>Navn</th>
-                    <th>Klasse</th>
-                </tr>
+                <tr><th>Brukernavn</th><th>Navn</th><th>Klasse</th></tr>
                 <?php foreach ($studenter as $s): ?>
                     <tr>
                         <td><?= htmlspecialchars($s['brukernavn']) ?></td>
