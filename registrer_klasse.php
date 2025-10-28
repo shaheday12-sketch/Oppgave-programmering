@@ -1,9 +1,7 @@
 <?php
 // Koble til databasen (forutsetter at db.php ligger i samme mappe)
 require_once __DIR__ . '/dp.php';
-
 $ok = $err = null;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $klassekode = trim($_POST['klassekode'] ?? '');
     $klassenavn = trim($_POST['klassenavn'] ?? '');
