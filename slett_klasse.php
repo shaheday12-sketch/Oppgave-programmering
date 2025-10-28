@@ -1,4 +1,4 @@
-<?php include "dp.php"; ?>
+<?php include "dp.php";?>
 <!doctype html>
 <html lang="no">
 <head>
