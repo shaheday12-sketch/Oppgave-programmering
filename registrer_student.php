@@ -1,4 +1,26 @@
-<?php require __DIR__ . '/db.php'; ?>
+<?php
+// Forsøk å finne db.php i flere vanlige steder
+$possible_paths = [
+    __DIR__ . '/db.php',        // Samme mappe som denne filen
+    __DIR__ . '/../db.php',     // Ett nivå opp
+    __DIR__ . '/../../db.php',  // To nivå opp
+];
+
+$db_found = false;
+
+foreach ($possible_paths as $path) {
+    if (file_exists($path)) {
+        require $path;
+        $db_found = true;
+        break;
+    }
+}
+
+if (!$db_found) {
+    die("Feil: db.php ble ikke funnet i noen av de vanlige plasseringene.");
+}
+?>
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
