@@ -1,71 +1,116 @@
-<?php
-// Koble til databasen
-require 'db.php'; // Pass på at db.php ligger i samme mappe som denne filen
-
-?>
-
-<!DOCTYPE html>
+<?php include "dp.php";?>
+<!doctype html>
 <html lang="no">
 <head>
-    <meta charset="UTF-8">
-    <title>Slett student</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<title>Slett klasse</title>
+<style>
+  body {
+    font-family: system-ui, Arial, sans-serif;
+    margin: 0;
+    background: #f5f6fa;
+    color: #222;
+    padding: 30px;
+  }
+  .form {
+    max-width: 420px;
+    margin: auto;
+    background: #fff;
+    border: 1px solid #e6e8ec;
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: 0 2px 5px rgba(0,0,0,.06);
+  }
+  h2 {
+    margin: 0 0 14px;
+    text-align: center;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 6px;
+    font: inherit;
+  }
+  button {
+    width: 100%;
+    margin-top: 14px;
+    background: #111;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px;
+    font: inherit;
+    cursor: pointer;
+  }
+  .msg {
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+  }
+  .ok { background: #e8f5e9; color: #2e7d32; }
+  .warn { background: #fff3cd; color: #856404; }
+  .err { background: #fdecea; color: #c62828; }
+  p.link { text-align: center; margin-top: 10px; }
+  a { color: #2563eb; text-decoration: none; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Slett student</h1>
-        <a href="index.php">← Tilbake</a>
+<div class="form">
+  <h2>Slett klasse</h2>
+  <?php
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+      $kode = $_POST["klassekode"] ?? "";
+      if ($kode === "") {
+        echo "<div class='msg err'>Velg en klasse.</div>";
+      } else {
+        // Ikke slett hvis klassen har studenter
+        $c = $conn->prepare("SELECT COUNT(*) FROM student WHERE klassekode=?");
+        $c->bind_param("s", $kode);
+        $c->execute();
+        $c->bind_result($ant);
+        $c->fetch();
+        $c->close();
 
-        <?php
-        // Hent alle studenter fra databasen
-        try {
-            $studenter = $pdo->query("
-                SELECT s.brukernavn, s.fornavn, s.etternavn, k.klassenavn
-                FROM student s
-                JOIN klasse k ON s.klassekode = k.klassekode
-                ORDER BY s.etternavn
-            ")->fetchAll();
-        } catch (PDOException $e) {
-            die("<p class='error'>Feil ved henting av studenter: " . htmlspecialchars($e->getMessage()) . "</p>");
-        }
-
-        // Når skjema sendes inn
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $brukernavn = trim($_POST['brukernavn'] ?? '');
-
-            if (empty($brukernavn)) {
-                echo "<p class='error'>Du må velge en student å slette.</p>";
-            } else {
-                try {
-                    $stmt = $pdo->prepare("DELETE FROM student WHERE brukernavn = ?");
-                    $stmt->execute([$brukernavn]);
-
-                    if ($stmt->rowCount() > 0) {
-                        echo "<p class='success'>Student ble slettet!</p>";
-                    } else {
-                        echo "<p class='error'>Ingen student med dette brukernavnet ble funnet.</p>";
-                    }
-                } catch (PDOException $e) {
-                    echo "<p class='error'>Feil ved sletting: " . htmlspecialchars($e->getMessage()) . "</p>";
+        if ($ant > 0) {
+          echo "<div class='msg warn'>Kan ikke slette – det er $ant student(er) i klassen.</div>";
+        } else {
+                    $d = $conn->prepare("DELETE FROM klasse WHERE klassekode=?");
+                    $d->bind_param("s", $kode);
+                    $d->execute();
+                    echo ($d->affected_rows > 0)
+                      ? "<div class='msg ok'>Klassen er slettet.</div>"
+                      : "<div class='msg warn'>Fant ingen slik klasse.</div>";
+                    $d->close();
+                  }
                 }
+              }
+            ?>
+            <form method="post">
+              <label for="klassekode">Velg klasse</label>
+              <select name="klassekode" id="klassekode">
+          <?php
+            $r = $conn->query("SELECT klassekode, navn FROM klasse ORDER BY navn");
+            if ($r) {
+              while ($row = $r->fetch_assoc()) {
+                $k = htmlspecialchars($row['klassekode']);
+                $n = htmlspecialchars($row['navn']);
+                echo "<option value=\"{$k}\">{$n}</option>\n";
+              }
+              $r->free();
             }
-        }
-        ?>
-
-        <form method="post">
-            <label>Velg student å slette:</label>
-            <select name="brukernavn" required>
-                <option value="">-- Velg student --</option>
-                <?php foreach ($studenter as $s): ?>
-                    <option value="<?= htmlspecialchars($s['brukernavn']) ?>">
-                        <?= htmlspecialchars($s['brukernavn']) ?> - 
-                        <?= htmlspecialchars($s['fornavn']) ?> <?= htmlspecialchars($s['etternavn']) ?> 
-                        (<?= htmlspecialchars($s['klassenavn']) ?>)
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <button type="submit" onclick="return confirm('Er du sikker på at du vil slette denne studenten?')">Slett</button>
-        </form>
-    </div>
-</body>
-</html>
+          ?>
+              </select>
+              <button type="submit">Slett</button>
+            </form>
+            <p class="link"><a href="index.php">Tilbake</a></p>
+          </div>
+          </body>
+          </html>
