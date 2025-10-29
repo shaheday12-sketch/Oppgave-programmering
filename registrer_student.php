@@ -1,24 +1,24 @@
 <?php
-// Koble til databasen (forutsetter at db.php ligger i samme mappe)
-require_once '/var/www/html/db.php';
+// Koble til databasen – db.php ligger i SAMME MAPPE
+require_once 'db.php';
 $ok = $err = null;
 
 // Hent klasser fra databasen
-$klasseresultat = $conn->query(query: "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
-$klasser = $klasseresultat->fetch_all(mode: MYSQLI_ASSOC);
+$klasseresultat = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+$klasser = $klasseresultat->fetch_all(MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $brukernavn = trim(string: $_POST['brukernavn'] ?? '');
-    $fornavn = trim(string: $_POST['fornavn'] ?? '');
-    $etternavn = trim(string: $_POST['etternavn'] ?? '');
-    $klassekode = trim(string: $_POST['klassekode'] ?? '');
+    $brukernavn = trim($_POST['brukernavn'] ?? '');
+    $fornavn = trim($_POST['fornavn'] ?? '');
+    $etternavn = trim($_POST['etternavn'] ?? '');
+    $klassekode = trim($_POST['klassekode'] ?? '');
 
     if ($brukernavn === '' || $fornavn === '' || $etternavn === '' || $klassekode === '') {
         $err = "Vennligst fyll ut alle felt.";
     } elseif (!preg_match('/^[a-z]{1,7}$/', $brukernavn)) {
         $err = "Brukernavn må bestå av 1–7 små bokstaver (a–z).";
     } else {
-        // 1) Forhåndssjekk – om brukernavnet finnes
+        // Sjekk om brukernavnet finnes
         $sjekk = $conn->prepare("SELECT 1 FROM student WHERE brukernavn = ?");
         $sjekk->bind_param("s", $brukernavn);
         $sjekk->execute();
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($sjekk->num_rows > 0) {
             $err = "Brukernavnet '{$brukernavn}' finnes allerede.";
         } else {
-            // 2) Sikker INSERT med prepared statement
+            // Legg til ny student
             $stmt = $conn->prepare("INSERT INTO student (brukernavn, fornavn, etternavn, klassekode) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("ssss", $brukernavn, $fornavn, $etternavn, $klassekode);
 
@@ -99,4 +99,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 </body>
 </html>
-
