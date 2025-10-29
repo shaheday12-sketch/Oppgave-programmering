@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Vis studenter</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h1>Alle studenter</h1>
-        <a href="../index.php">Tilbake</a>
+        <a href="index.php">Tilbake</a>
 
         <?php
-        // KOBLE TIL DATABASE – BRUK SAMME SOM I REGISTRER-STUDENT
-        require_once '../db.php';  // ← JUSTER STIEN OM NØDVENDIG
+        // KOBLE TIL DATABASE – db.php MÅ ligge i SAMME MAPPE
+        require_once 'db.php';
 
-        // Hent alle studenter med klassenavn
+        // SQL-spørring: Hent studenter + klassenavn
         $sql = "
             SELECT s.brukernavn, s.fornavn, s.etternavn, k.klassenavn 
             FROM student s 
@@ -27,25 +27,29 @@
 
         <?php if ($result && $result->num_rows > 0): ?>
             <table>
-                <tr>
-                    <th>Brukernavn</th>
-                    <th>Navn</th>
-                    <th>Klasse</th>
-                </tr>
-                <?php while ($s = $result->fetch_assoc()): ?>
+                <thead>
                     <tr>
-                        <td><?= htmlspecialchars($s['brukernavn']) ?></td>
-                        <td><?= htmlspecialchars($s['fornavn'] . ' ' . $s['etternavn']) ?></td>
-                        <td><?= htmlspecialchars($s['klassenavn']) ?></td>
+                        <th>Brukernavn</th>
+                        <th>Navn</th>
+                        <th>Klasse</th>
                     </tr>
-                <?php endwhile; ?>
+                </thead>
+                <tbody>
+                    <?php while ($s = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($s['brukernavn']) ?></td>
+                            <td><?= htmlspecialchars($s['fornavn'] . ' ' . $s['etternavn']) ?></td>
+                            <td><?= htmlspecialchars($s['klassenavn']) ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
             </table>
         <?php else: ?>
-            <p>Ingen studenter registrert.</p>
+            <p><em>Ingen studenter registrert ennå.</em></p>
         <?php endif; ?>
 
         <?php 
-        // Lukk tilkobling (valgfritt, men ryddig)
+        // Frigjør minne (valgfritt, men ryddig)
         if ($result) $result->free();
         ?>
     </div>
