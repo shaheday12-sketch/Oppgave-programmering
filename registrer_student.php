@@ -1,6 +1,6 @@
 <?php
 // Koble til databasen (forutsetter at db.php ligger i samme mappe)
-require_once __DIR__ . '/includes/db.php';
+require_once '/var/www/html/db.php';
 $ok = $err = null;
 
 // Hent klasser fra databasen
