@@ -1,6 +1,5 @@
 <?php
-// Koble til databasen
-require_once __DIR__ . '/db.php';// db.php må ligge i samme mappe som denne filen
+require_once __DIR__ . '/db.php'; // må ligge i samme mappe
 
 // Hent klasser fra databasen
 try {
@@ -18,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $errors = [];
 
-    // Enkel validering
     if (!preg_match('/^[a-z]{1,7}$/', $brukernavn)) {
         $errors[] = "Brukernavn må bestå av 1–7 små bokstaver (a–z).";
     }
@@ -29,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Du må velge en klasse.";
     }
 
-    // Hvis ingen feil: prøv å legge til i databasen
     if (empty($errors)) {
         try {
             $stmt = $pdo->prepare("
@@ -53,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Registrer student</title>
-    <link rel="stylesheet" href="style.css">
     <style>
         body { font-family: system-ui, sans-serif; background: #f8f8f8; padding: 2rem; }
         .container { background: white; padding: 2rem; border-radius: 12px; max-width: 500px; margin: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -68,37 +64,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="index.php">← Tilbake</a>
-        <h1>Registrer ny student</h1>
+<div class="container">
+    <a href="index.php">← Tilbake</a>
+    <h1>Registrer ny student</h1>
 
-        <?php
-        if (!empty($success)) echo "<p class='success'>$success</p>";
-        if (!empty($errors)) foreach ($errors as $e) echo "<p class='error'>$e</p>";
-        ?>
+    <?php
+    if (!empty($success)) echo "<p class='success'>$success</p>";
+    if (!empty($errors)) foreach ($errors as $e) echo "<p class='error'>$e</p>";
+    ?>
 
-        <form method="post">
-            <label for="brukernavn">Brukernavn (1–7 små bokstaver):</label>
-            <input type="text" name="brukernavn" id="brukernavn" maxlength="7" pattern="[a-z]{1,7}" required>
+    <form method="post">
+        <label for="brukernavn">Brukernavn (1–7 små bokstaver):</label>
+        <input type="text" name="brukernavn" id="brukernavn" maxlength="7" pattern="[a-z]{1,7}" required>
 
-            <label for="fornavn">Fornavn:</label>
-            <input type="text" name="fornavn" id="fornavn" required>
+        <label for="fornavn">Fornavn:</label>
+        <input type="text" name="fornavn" id="fornavn" required>
 
-            <label for="etternavn">Etternavn:</label>
-            <input type="text" name="etternavn" id="etternavn" required>
+        <label for="etternavn">Etternavn:</label>
+        <input type="text" name="etternavn" id="etternavn" required>
 
-            <label for="klassekode">Klasse:</label>
-            <select name="klassekode" id="klassekode" required>
-                <option value="">-- Velg klasse --</option>
-                <?php foreach ($klasser as $k): ?>
-                    <option value="<?= htmlspecialchars($k['klassekode']) ?>">
-                        <?= htmlspecialchars($k['klassekode']) ?> - <?= htmlspecialchars($k['klassenavn']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+        <label for="klassekode">Klasse:</label>
+        <select name="klassekode" id="klassekode" required>
+            <option value="">-- Velg klasse --</option>
+            <?php foreach ($klasser as $k): ?>
+                <option value="<?= htmlspecialchars($k['klassekode']) ?>">
+                    <?= htmlspecialchars($k['klassekode']) ?> - <?= htmlspecialchars($k['klassenavn']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
 
-            <button type="submit">Registrer student</button>
-        </form>
-    </div>
+        <button type="submit">Registrer student</button>
+    </form>
+</div>
 </body>
 </html>
