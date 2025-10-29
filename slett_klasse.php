@@ -12,7 +12,7 @@
         select, button { margin: 10px 0; padding: 8px; font-size: 16px; }
     </style>
 </head>
-<body>
+<body require_once 'db.php';
     <div class="container">
         <h1>Slett student</h1>
         <a href="index.php">Tilbake</a>
