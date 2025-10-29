@@ -1,6 +1,5 @@
 <?php require_once(__DIR__ . '/db.php');
 $msg = null; $err = null;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $klassekode = $_POST['klassekode'] ?? '';
     if ($klassekode !== '') {
@@ -17,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 $klasser = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
 ?>
->>>>>>> 622d0cd9e7c88719d65b331815060f96c70c3592
 <!doctype html>
 <html lang="no">
 <head>
