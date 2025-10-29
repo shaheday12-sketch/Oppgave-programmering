@@ -1,69 +1,42 @@
-<?php include "db.php"; ?>
+<?php
+require_once _DIR_ . '/db.php';
+
+$msg = null; $err = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $klassekode = $_POST['klassekode'] ?? '';
+    if ($klassekode !== '') {
+        $stmt = $conn->prepare("DELETE FROM klasse WHERE klassekode = ?");
+        $stmt->bind_param("s", $klassekode);
+        try {
+            $stmt->execute();
+            $msg = "Klasse slettet.";
+        } catch (mysqli_sql_exception $e) {
+            $err = "Kunne ikke slette (har kanskje studenter knyttet?): " . htmlspecialchars($e->getMessage());
+        }
+        $stmt->close();
+    }
+}
+$klasser = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+?>
 <!doctype html>
-<html lang="no">
-<head>
-<meta charset="utf-8">
-<title>Slett student</title>
-<style>
-  body {font-family: Arial; background: #f5f6fa; padding: 30px;}
-  .form {max-width: 400px; margin: auto; background: #fff; padding: 20px; border-radius: 8px;}
-  h2 {text-align: center;}
-  select, button {width: 100%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc;}
-  button {background: #111; color: #fff; cursor: pointer;}
-  .msg {text-align: center; margin-top: 10px; padding: 8px; border-radius: 6px;}
-  .ok {background: #e8f5e9; color: #2e7d32;}
-  .warn {background: #fff3cd; color: #856404;}
-  .err {background: #fdecea; color: #c62828;}
-</style>
-</head>
+<html lang="no"><head><meta charset="utf-8"><title>Slett klasse</title><link rel="stylesheet" href="style.css"></head>
 <body>
-
-<div class="form">
-  <h2>Slett student</h2>
-
-  <?php
-  if ($_SERVER["REQUEST_METHOD"] === "POST") {
-      $studentnr = $_POST["studentnr"] ?? "";
-
-      if ($studentnr == "") {
-          echo "<div class='msg err'>Velg en student.</div>";
-      } else {
-          // Slett studenten
-          $sql = "DELETE FROM student WHERE studentnr='$studentnr'";
-          if ($conn->query($sql) === TRUE) {
-              if ($conn->affected_rows > 0) {
-                  echo "<div class='msg ok'>Studenten er slettet.</div>";
-              } else {
-                  echo "<div class='msg warn'>Fant ingen student med dette nummeret.</div>";
-              }
-          } else {
-              echo "<div class='msg err'>Feil: " . $conn->error . "</div>";
-          }
-      }
-  }
-  ?>
-
-  <form method="post" onsubmit="return confirm('Vil du slette denne studenten?')">
-    <label for="studentnr">Velg student</label>
-    <select name="studentnr" id="studentnr" required>
-      <option value="">Velg student</option>
-      <?php
-      $result = $conn->query("SELECT studentnr, fornavn, etternavn FROM student ORDER BY studentnr");
-      if ($result && $result->num_rows > 0) {
-          while ($row = $result->fetch_assoc()) {
-              $id = htmlspecialchars($row['studentnr']);
-              $navn = htmlspecialchars($row['fornavn'] . " " . $row['etternavn']);
-              echo "<option value='$id'>$id – $navn</option>";
-          }
-      }
-      ?>
+<h1>Slett klasse</h1>
+<?php if ($msg): ?><p class="ok"><?= htmlspecialchars($msg) ?></p><?php endif; ?>
+<?php if ($err): ?><p class="err"><?= htmlspecialchars($err) ?></p><?php endif; ?>
+<form method="post" class="form">
+  <label>Velg klasse:
+    <select name="klassekode" required>
+      <option value="">-- Velg --</option>
+      <?php while ($k = $klasser->fetch_assoc()): ?>
+        <option value="<?= htmlspecialchars($k['klassekode']) ?>">
+          <?= htmlspecialchars($k['klassekode']) ?> – <?= htmlspecialchars($k['klassenavn']) ?>
+        </option>
+      <?php endwhile; ?>
     </select>
-
-    <button>Slett</button>
-  </form>
-
-  <p style="text-align:center; margin-top:10px;"><a href="index.php">← Tilbake</a></p>
-</div>
-
-</body>
-</html>
+  </label>
+  <button type="submit">Slett</button>
+</form>
+<p><a href="index.php">Tilbake</a></p>
+</body></html>
