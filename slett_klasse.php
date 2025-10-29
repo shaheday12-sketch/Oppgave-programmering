@@ -105,8 +105,3 @@ vis klasser
   </div>
 </body>
 </html>
-
-
-
-
-

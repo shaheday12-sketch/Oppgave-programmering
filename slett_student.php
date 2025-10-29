@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 <?php require_once 'db.php'; ?>
 <!doctype html>
 <html lang="no">
