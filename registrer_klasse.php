@@ -2,8 +2,7 @@
 // registrer_klasse.php
 
 // Inkluder db.php - pass på at stien er riktig
-include __DIR__ . "/db.php"; // Hvis db.php ligger i samme mappe
-
+include __DIR__ . "/db.php";
 ?>
 <!doctype html>
 <html lang="no">
