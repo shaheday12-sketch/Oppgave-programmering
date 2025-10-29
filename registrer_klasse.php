@@ -1,8 +1,6 @@
 <?php
 // registrer_klasse.php
-
-// Inkluder db.php - pass på at stien er riktig
-include __DIR__ . "/db.php";
+include('db.php')
 ?>
 <!doctype html>
 <html lang="no">
