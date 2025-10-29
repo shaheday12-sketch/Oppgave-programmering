@@ -62,7 +62,7 @@
 </html>
 
 vis klasser  
-<?php include "db.php"; ?>
+<?php require_once 'db.php'; ?>
 <!doctype html>
 <html lang="no">
 <head>
