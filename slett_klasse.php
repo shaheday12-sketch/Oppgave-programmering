@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 <?php include "db.php"; ?>
+=======
+<?php require_once 'db.php'; ?>
+>>>>>>> 3cf4753f1cef1ff797f1e33fdc22efac660f97fe
 <!doctype html>
 <html lang="no">
 <head>
