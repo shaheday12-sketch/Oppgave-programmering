@@ -1,6 +1,6 @@
 <?php
 // Koble til databasen – db.php ligger i SAMME MAPPE
-require_once 'db.php';
+require_once __DIR__ . '/dp.php';
 $ok = $err = null;
 
 // Hent klasser fra databasen
