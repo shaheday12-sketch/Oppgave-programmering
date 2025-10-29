@@ -17,7 +17,7 @@
   .err{background:#fdecea;color:#c62828}
   p.link{text-align:center;margin-top:10px}
   a{color:#2563eb;text-decoration:none}
-</style>
+</style>s
 </head>
 <body>
 <div class="form">
