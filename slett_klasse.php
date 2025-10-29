@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-<?php include "db.php"; ?>
-=======
-<?php
-require_once __DIR__ . '/db.php';
-
+<?php require_once __DIR__ . '/db.php';
 $msg = null; $err = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
