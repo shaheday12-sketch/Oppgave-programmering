@@ -1,6 +1,7 @@
+registrer klasse 
 <?php
-// Koble til databasen (forutsetter at db.php ligger i samme mappe)
-require_once __DIR__ . '/db.php';
+require_once _DIR_ . '/db.php';
+
 $ok = $err = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -11,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($klassekode === '' || $klassenavn === '' || $studiumkode === '') {
         $err = "Vennligst fyll ut alle felt.";
     } else {
-        // 1) Forhåndssjekk – om klassekoden finnes
+        // 1) Forhåndssjekk – dette kaster ikke exception
         $sjekk = $conn->prepare("SELECT 1 FROM klasse WHERE klassekode = ?");
         $sjekk->bind_param("s", $klassekode);
         $sjekk->execute();
@@ -20,10 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($sjekk->num_rows > 0) {
             $err = "Klassekoden '{$klassekode}' finnes allerede. Prøv en annen kode.";
         } else {
-            // 2) Sikker INSERT med prepared statement
+            // 2) Sikker INSERT med prepared statement (ingen query())
             $stmt = $conn->prepare("INSERT INTO klasse (klassekode, klassenavn, studiumkode) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $klassekode, $klassenavn, $studiumkode);
 
+            // Noen miljøer har mysqli_report aktiv → fang exceptions her
             try {
                 if ($stmt->execute()) {
                     $ok = "Klassen '{$klassekode}' ble registrert!";
@@ -31,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $err = "Noe gikk galt under registrering. Prøv igjen.";
                 }
             } catch (mysqli_sql_exception $e) {
+                // 1062 = duplikat primærnøkkel
                 if ($e->getCode() === 1062) {
                     $err = "Klassekoden '{$klassekode}' finnes allerede. Prøv en annen kode.";
                 } else {

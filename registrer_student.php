@@ -4,14 +4,14 @@ require_once '/var/www/html/db.php';
 $ok = $err = null;
 
 // Hent klasser fra databasen
-$klasseresultat = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
-$klasser = $klasseresultat->fetch_all(MYSQLI_ASSOC);
+$klasseresultat = $conn->query(query: "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+$klasser = $klasseresultat->fetch_all(mode: MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $brukernavn = trim($_POST['brukernavn'] ?? '');
-    $fornavn = trim($_POST['fornavn'] ?? '');
-    $etternavn = trim($_POST['etternavn'] ?? '');
-    $klassekode = trim($_POST['klassekode'] ?? '');
+    $brukernavn = trim(string: $_POST['brukernavn'] ?? '');
+    $fornavn = trim(string: $_POST['fornavn'] ?? '');
+    $etternavn = trim(string: $_POST['etternavn'] ?? '');
+    $klassekode = trim(string: $_POST['klassekode'] ?? '');
 
     if ($brukernavn === '' || $fornavn === '' || $etternavn === '' || $klassekode === '') {
         $err = "Vennligst fyll ut alle felt.";
