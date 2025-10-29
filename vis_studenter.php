@@ -12,7 +12,7 @@
 
         <?php
         // KOBLE TIL DATABASE – db.php MÅ ligge i SAMME MAPPE
-        require_once 'db.php';
+       require_once __DIR__ . '/dp.php';
 
         // SQL-spørring: Hent studenter + klassenavn
         $sql = "
