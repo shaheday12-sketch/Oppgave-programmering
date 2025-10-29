@@ -1,8 +1,8 @@
 <?php
-// Inkluder databasekoblingen
+// Inkluder db.php fra samme mappe
 include(__DIR__ . '/db.php');
 
-// Sjekk at databasekoblingen fungerer
+// Sjekk at databasekoblingen finnes
 if (!$conn) {
     die("Database connection not established.");
 }
