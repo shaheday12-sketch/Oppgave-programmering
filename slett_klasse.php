@@ -1,4 +1,28 @@
+<<<<<<< HEAD
 <?php include "db.php"; ?>
+=======
+<?php
+require_once __DIR__ . '/db.php';
+
+$msg = null; $err = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $klassekode = $_POST['klassekode'] ?? '';
+    if ($klassekode !== '') {
+        $stmt = $conn->prepare("DELETE FROM klasse WHERE klassekode = ?");
+        $stmt->bind_param("s", $klassekode);
+        try {
+            $stmt->execute();
+            $msg = "Klasse slettet.";
+        } catch (mysqli_sql_exception $e) {
+            $err = "Kunne ikke slette (har kanskje studenter knyttet?): " . htmlspecialchars($e->getMessage());
+        }
+        $stmt->close();
+    }
+}
+$klasser = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+?>
+>>>>>>> 622d0cd9e7c88719d65b331815060f96c70c3592
 <!doctype html>
 <html lang="no">
 <head>
