@@ -31,7 +31,6 @@ include __DIR__ . "/db.php"; // Hvis db.php ligger i samme mappe
   <h2>Registrer klasse</h2>
 
 <?php
-// Sjekk om skjema er sendt
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $kode = trim($_POST["klassekode"] ?? "");
     $navn = trim($_POST["klassenavn"] ?? "");
