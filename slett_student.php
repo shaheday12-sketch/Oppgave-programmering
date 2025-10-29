@@ -1,8 +1,15 @@
-<?php include "db.php"; ?>
+
+
+
+
+
+
+
+<?php require_once 'db.php'; ?>
 <!doctype html>
 <html lang="no">
 <head>
-<meta charset="utf-8"><title>Slett klasse</title>
+<meta charset="utf-8"><title>Slett stundet</title>
 <style>
   body{font-family:system-ui,Arial;margin:0;background:#f5f6fa;color:#222;padding:30px}
   .form{max-width:420px;margin:auto;background:#fff;border:1px solid #e6e8ec;border-radius:10px;padding:20px 24px;box-shadow:0 2px 5px rgba(0,0,0,.06)}
@@ -20,12 +27,12 @@
 </head>
 <body>
 <div class="form">
-  <h2>Slett klasse</h2>
+  <h2>Slett stundet</h2>
   <?php
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
       $kode = $_POST["klassekode"] ?? "";
       if ($kode === "") {
-        echo "<div class='msg err'>Velg en klasse.</div>";
+        echo "<div class='msg err'>Velg en studnet.</div>";
       } else {
         // ikke slett hvis klassen har studenter
         $c = $conn->prepare("SELECT COUNT(*) FROM student WHERE klassekode=?");
@@ -36,13 +43,13 @@
           $d = $conn->prepare("DELETE FROM klasse WHERE klassekode=?");
           $d->bind_param("s", $kode); $d->execute();
           echo ($d->affected_rows > 0)
-            ? "<div class='msg ok'>Klassen er slettet.</div>"
-            : "<div class='msg warn'>Fant ingen slik klasse.</div>";
+            ? "<div class='msg ok'>studenten er slettet.</div>"
+            : "<div class='msg warn'>Fant ingen slik studnet.</div>";
         }
       }
     }
   ?>
-  <form method="post" onsubmit="return confirm('Slette valgt klasse?')">
+  <form method="post" onsubmit="return confirm('Slette valgt studnet?')">
     <label for="klassekode">Velg klasse</label>
     <select id="klassekode" name="klassekode" required>
       <option value="">Velg klasse</option>
@@ -63,7 +70,7 @@
 </html>
 
 vis klasser  
-<?php include "db.php"; ?>
+<?php require_once 'db.php'; ?>
 <!doctype html>
 <html lang="no">
 <head>
@@ -105,4 +112,3 @@ vis klasser
   </div>
 </body>
 </html>
-
