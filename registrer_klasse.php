@@ -1,6 +1,6 @@
 <?php
 // registrer_klasse.php
-include('db.php')
+include(__DIR__ . '/db.php');
 ?>
 <!doctype html>
 <html lang="no">
