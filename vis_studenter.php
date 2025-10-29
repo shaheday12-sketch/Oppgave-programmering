@@ -57,7 +57,7 @@
       <table>
         <thead>
           <tr>
-            <th>Student-ID</th>
+            <th>Studentnummer</th>
             <th>Fornavn</th>
             <th>Etternavn</th>
             <th>Klassekode</th>
@@ -66,11 +66,11 @@
         <tbody>
         <?php
           // Hent alle studenter fra databasen
-          $res = $conn->query("SELECT studentid, fornavn, etternavn, klassekode FROM student ORDER BY studentid");
+          $res = $conn->query("SELECT studentnr, fornavn, etternavn, klassekode FROM student ORDER BY studentnr");
           if ($res && $res->num_rows > 0) {
               while ($r = $res->fetch_assoc()) {
                   echo "<tr>
-                          <td>" . htmlspecialchars($r['studentid']) . "</td>
+                          <td>" . htmlspecialchars($r['studentnr']) . "</td>
                           <td>" . htmlspecialchars($r['fornavn']) . "</td>
                           <td>" . htmlspecialchars($r['etternavn']) . "</td>
                           <td>" . htmlspecialchars($r['klassekode']) . "</td>
