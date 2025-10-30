@@ -1,5 +1,4 @@
-<?php
-require_once('includes/db.php');
+<?php require_once('includes/db.php');
 
 $msg = null;
 $err = null;
