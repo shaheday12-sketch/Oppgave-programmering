@@ -1,7 +1,9 @@
-<?php require_once('includes/db.php');
+<?php
+require_once('includes/db.php'); // Pass på at denne filen finnes og definerer $conn
 
 $msg = null;
 $err = null;
+$antStudenter = 0; // trygg default for visning
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $klassekode = $_POST['klassekode'] ?? '';
@@ -10,31 +12,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $err = "Velg en klasse.";
     } else {
         // Sjekk om klassen har studenter
-        $stmt = $conn->prepare(query: "SELECT COUNT(*) FROM student WHERE klassekode = ?");
-        $stmt->bind_param(types: "s", var: $klassekode);
-        $stmt->execute();
-        $stmt->bind_result($antStudenter);
-        $stmt->fetch();
-        $stmt->close();
-
-        if ($antStudenter > 0) {
-            $err = "Kan ikke slette klassen – $antStudenter student(er) er knyttet til den.";
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM student WHERE klassekode = ?");
+        if ($stmt === false) {
+            $err = "Databasefeil: klarte ikke forberede spørring.";
         } else {
-            // Slett klassen
-            $stmt = $conn->prepare(query: "DELETE FROM klasse WHERE klassekode = ?");
-            $stmt->bind_param(types: "s", var: $klassekode);
-            if ($stmt->execute()) {
-                $msg = ($stmt->affected_rows > 0) ? "Klassen er slettet." : "Fant ingen slik klasse.";
-            } else {
-                $err = "Kunne ikke slette klassen: " . htmlspecialchars($stmt->error);
-            }
+            $stmt->bind_param("s", $klassekode);
+            $stmt->execute();
+            $stmt->bind_result($antStudenter);
+            $stmt->fetch();
             $stmt->close();
+
+            if ($antStudenter > 0) {
+                $err = "Kan ikke slette klassen – $antStudenter student(er) er knyttet til den.";
+            } else {
+                // Slett klassen
+                $stmt = $conn->prepare("DELETE FROM klasse WHERE klassekode = ?");
+                if ($stmt === false) {
+                    $err = "Databasefeil: klarte ikke forberede sletting.";
+                } else {
+                    $stmt->bind_param("s", $klassekode);
+                    if ($stmt->execute()) {
+                        $msg = ($stmt->affected_rows > 0) ? "Klassen er slettet." : "Fant ingen slik klasse.";
+                    } else {
+                        $err = "Kunne ikke slette klassen: " . htmlspecialchars($stmt->error);
+                    }
+                    $stmt->close();
+                }
+            }
         }
     }
 }
 
 // Hent alle klasser for dropdown
-$klasser = $conn->query(query: "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+$klasser = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+if ($klasser === false) {
+    $err = $err ?? "Feil ved henting av klasser.";
+}
 ?>
 
 <!doctype html>
@@ -71,11 +84,13 @@ a{color:#2563eb;text-decoration:none}
     <label for="klassekode">Velg klasse</label>
     <select id="klassekode" name="klassekode" required>
         <option value="">Velg klasse</option>
-        <?php while ($row = $klasser->fetch_assoc()): ?>
-            <option value="<?= htmlspecialchars($row['klassekode']) ?>">
-                <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
-            </option>
-        <?php endwhile; ?>
+        <?php if ($klasser && $klasser->num_rows > 0): ?>
+            <?php while ($row = $klasser->fetch_assoc()): ?>
+                <option value="<?= htmlspecialchars($row['klassekode']) ?>">
+                    <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
+                </option>
+            <?php endwhile; ?>
+        <?php endif; ?>
     </select>
     <button>Slett</button>
 </form>
