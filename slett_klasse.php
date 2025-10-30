@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $err = "Velg en klasse.";
     } else {
         // Sjekk om klassen har studenter
-        $stmt = $conn->prepare("SELECT COUNT(*) FROM student WHERE klassekode = ?");
-        $stmt->bind_param("s", $klassekode);
+        $stmt = $conn->prepare(query: "SELECT COUNT(*) FROM student WHERE klassekode = ?");
+        $stmt->bind_param(types: "s", var: $klassekode);
         $stmt->execute();
         $stmt->bind_result($antStudenter);
         $stmt->fetch();
@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $err = "Kan ikke slette klassen – $antStudenter student(er) er knyttet til den.";
         } else {
             // Slett klassen
-            $stmt = $conn->prepare("DELETE FROM klasse WHERE klassekode = ?");
-            $stmt->bind_param("s", $klassekode);
+            $stmt = $conn->prepare(query: "DELETE FROM klasse WHERE klassekode = ?");
+            $stmt->bind_param(types: "s", var: $klassekode);
             if ($stmt->execute()) {
                 $msg = ($stmt->affected_rows > 0) ? "Klassen er slettet." : "Fant ingen slik klasse.";
             } else {
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Hent alle klasser for dropdown
-$klasser = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+$klasser = $conn->query(query: "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
 ?>
 
 <!doctype html>
