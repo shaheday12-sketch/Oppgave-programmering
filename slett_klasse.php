@@ -1,9 +1,9 @@
 <?php
-require_once('includes/db.php'); // Pass på at denne filen finnes og definerer $conn
+require_once('includes/db.php'); // Pass på at db.php ligger i includes/
 
 $msg = null;
 $err = null;
-$antStudenter = 0; // trygg default for visning
+$antStudenter = 0; // Standardverdi for visning
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $klassekode = $_POST['klassekode'] ?? '';
