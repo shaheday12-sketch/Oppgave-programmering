@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Hent alle klasser for dropdown
-$klasser = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+$klasser = $conn->query(query: "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
 if ($klasser === false) {
     $err = $err ?? "Feil ved henting av klasser.";
 }
