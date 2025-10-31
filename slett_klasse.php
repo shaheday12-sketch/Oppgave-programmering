@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+'db.php';
 $msg = null;
 $err = null;
 $antStudenter = 0; // Standardverdi for visning
