@@ -1,6 +1,5 @@
 <?php
-require_once('db.php'); // Pass på at db.php ligger i includes/
-
+('db.php');
 $msg = null;
 $err = null;
 $antStudenter = 0; // Standardverdi for visning
