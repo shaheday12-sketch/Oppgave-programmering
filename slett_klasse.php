@@ -1,5 +1,5 @@
 <?php
-require_once('includes/db.php'); // Pass på at db.php ligger i includes/
+require_once('db.php'); // Pass på at db.php ligger i includes/
 
 $msg = null;
 $err = null;
