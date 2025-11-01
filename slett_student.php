@@ -41,7 +41,7 @@
     }
   ?>
   <form method="post" onsubmit="return confirm('Slette valgt studnet?')">
-    <label for="klassekode">Velg klasse</label>
+    <label for="klassekode">Velg student </label>
     <select id="klassekode" name="klassekode" required>
       <option value="">Velg klasse</option>
       <?php
