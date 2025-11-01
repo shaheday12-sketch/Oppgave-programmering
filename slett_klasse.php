@@ -32,17 +32,17 @@ a{color:#2563eb;text-decoration:none}
     <label for="klassekode">Velg klasse</label>
     <select id="klassekode" name="klassekode" required>
         <option value="">Velg klasse</option>
-        <?php if ($klasser && ((is_object($klasser) && $klasser->num_rows > 0) || (is_array($klasser) && count($klasser) > 0))): ?>
-            <?php if (is_object($klasser)): ?>
+        <?php if ($klasser && ((is_object(value: $klasser) && $klasser->num_rows > 0) || (is_array($klasser) && count($klasser) > 0))): ?>
+            <?php if (is_object(value: $klasser)): ?>
                 <?php while ($row = $klasser->fetch_assoc()): ?>
-                    <option value="<?= htmlspecialchars($row['klassekode']) ?>">
-                        <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
+                    <option value="<?= htmlspecialchars(string: $row['klassekode']) ?>">
+                        <?= htmlspecialchars(string: $row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
                     </option>
                 <?php endwhile; ?>
             <?php else: ?>
                 <?php foreach ($klasser as $row): ?>
-                    <option value="<?= htmlspecialchars($row['klassekode']) ?>">
-                        <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
+                    <option value="<?= htmlspecialchars(string: $row['klassekode']) ?>">
+                        <?= htmlspecialchars(string: $row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
                     </option>
                 <?php endforeach; ?>
             <?php endif; ?>

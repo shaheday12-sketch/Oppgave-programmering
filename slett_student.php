@@ -1,7 +1,5 @@
-<?php 
-require_once __DIR__ . '/includes/db.php';
-?>
-<!doctype html>
+// Koble til databasen (forutsetter at db.php ligger i samme mappe)
+require_once __DIR__ . '/dp.php';
 <html lang="no">
 <head>
 <meta charset="utf-8"><title>Slett stundet</title>
