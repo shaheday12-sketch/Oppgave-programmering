@@ -43,7 +43,7 @@
   <form method="post" onsubmit="return confirm('Slette valgt studnet?')">
     <label for="klassekode">Velg student </label>
     <select id="klassekode" name="klassekode" required>
-      <option value="">Velg klasse</option>
+      <option value="">Velg student</option>
       <?php
         $r = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
         while ($x = $r->fetch_assoc()) {
@@ -65,7 +65,7 @@ vis klasser
 <!doctype html>
 <html lang="no">
 <head>
-  <meta charset="utf-8"><title>Alle klasser</title>
+  <meta charset="utf-8"><title>Alle studenter</title>
   <style>
     body{font-family:system-ui,Arial;margin:0;background:#f5f6fa;color:#222;padding:30px}
     .wrap{max-width:900px;margin:auto}
