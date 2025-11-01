@@ -1,5 +1,5 @@
-<?php
-'db.php';
+// Koble til databasen (forutsetter at db.php ligger i samme mappe)
+require_once __DIR__ . '/dp.php';
 $msg = null;
 $err = null;
 $antStudenter = 0; // Standardverdi for visning
@@ -43,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Hent alle klasser for dropdown
-$klasser = $conn->query(query: "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
-if ($klasser === false) {
+$klasser = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+if (!$klasser) {
     $err = $err ?? "Feil ved henting av klasser.";
 }
 ?>
@@ -83,12 +83,20 @@ a{color:#2563eb;text-decoration:none}
     <label for="klassekode">Velg klasse</label>
     <select id="klassekode" name="klassekode" required>
         <option value="">Velg klasse</option>
-        <?php if ($klasser && $klasser->num_rows > 0): ?>
-            <?php while ($row = $klasser->fetch_assoc()): ?>
-                <option value="<?= htmlspecialchars($row['klassekode']) ?>">
-                    <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
-                </option>
-            <?php endwhile; ?>
+        <?php if ($klasser && ((is_object($klasser) && $klasser->num_rows > 0) || (is_array($klasser) && count($klasser) > 0))): ?>
+            <?php if (is_object($klasser)): ?>
+                <?php while ($row = $klasser->fetch_assoc()): ?>
+                    <option value="<?= htmlspecialchars($row['klassekode']) ?>">
+                        <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
+                    </option>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <?php foreach ($klasser as $row): ?>
+                    <option value="<?= htmlspecialchars($row['klassekode']) ?>">
+                        <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
+                    </option>
+                <?php endforeach; ?>
+            <?php endif; ?>
         <?php endif; ?>
     </select>
     <button>Slett</button>
