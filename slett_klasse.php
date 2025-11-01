@@ -1,3 +1,60 @@
+<?php
+require_once __DIR__ . '/db.php';
+
+// 👇 Sett standardverdier for variabler
+$msg = "";
+$err = "";
+$antStudenter = 0;
+$klasser = [];
+
+// Hvis brukeren har trykket "Slett"
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $klassekode = $_POST['klassekode'] ?? '';
+
+    if ($klassekode === '') {
+        $err = "Velg en klasse.";
+    } else {
+        // Sjekk om klassen har studenter
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM student WHERE klassekode = ?");
+        if ($stmt) {
+            $stmt->bind_param("s", $klassekode);
+            $stmt->execute();
+            $stmt->bind_result($antStudenter);
+            $stmt->fetch();
+            $stmt->close();
+
+            if ($antStudenter > 0) {
+                $err = "Kan ikke slette klassen – den er knyttet til $antStudenter student(er).";
+            } else {
+                // Slett klassen
+                $stmt = $conn->prepare("DELETE FROM klasse WHERE klassekode = ?");
+                if ($stmt) {
+                    $stmt->bind_param("s", $klassekode);
+                    if ($stmt->execute()) {
+                        $msg = "Klassen er slettet.";
+                    } else {
+                        $err = "Feil ved sletting: " . htmlspecialchars($stmt->error);
+                    }
+                    $stmt->close();
+                } else {
+                    $err = "Feil ved forberedelse av sletting: " . htmlspecialchars($conn->error);
+                }
+            }
+        } else {
+            $err = "Feil ved spørring: " . htmlspecialchars($conn->error);
+        }
+    }
+}
+
+// Hent alle klasser for nedtrekksmenyen
+$result = $conn->query("SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode");
+if ($result) {
+    $klasser = $result;
+} else {
+    $err = "Feil ved henting av klasser: " . htmlspecialchars($conn->error);
+}
+?>
+
 <!doctype html>
 <html lang="no">
 <head>
