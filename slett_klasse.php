@@ -30,7 +30,7 @@ a{color:#2563eb;text-decoration:none}
 
 <form method="post" onsubmit="return confirm('Slette valgt klasse?')">
     <label for="klassekode">Velg klasse</label>
-    <select id="klassekode" name="klassekode" required>
+    <se lect id="klassekode" name="klassekode" required>
         <option value="">Velg klasse</option>
         <?php if ($klasser && ((is_object(value: $klasser) && $klasser->num_rows > 0) || (is_array($klasser) && count($klasser) > 0))): ?>
             <?php if (is_object(value: $klasser)): ?>
