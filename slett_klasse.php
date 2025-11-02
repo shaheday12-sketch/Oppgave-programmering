@@ -1,5 +1,59 @@
 <?php
+// --- KOBLE TIL DATABASEN ---
+$server = "b-studentsql-1.usn.no";     // endre hvis du bruker annen server
+$bruker = "shayo1243";          // skriv inn brukernavnet ditt
+$passord = "5791shayo1243";             // skriv inn passordet ditt
+$dbnavn = "shayo1243";   
+
+$conn = new mysqli($server, $bruker, $passord, $dbnavn);
+if ($conn->connect_error) {
+    die("Feil ved tilkobling: " . $conn->connect_error);
+}
+
+// --- DEFINER VARIABLER ---
+$klasser = [];
+$msg = null;
+$err = null;
+$antStudenter = 0;
+
+// --- HENT KLASSER FRA DATABASE ---
+$sql = "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode";
+$resultat = $conn->query($sql);
+if ($resultat && $resultat->num_rows > 0) {
+    $klasser = $resultat;
+}
+
+// --- HÅNDTER SLETTING ---
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $klassekode = $_POST["klassekode"] ?? '';
+
+    if ($klassekode !== '') {
+        // Sjekk om det finnes studenter i denne klassen
+        $sjekk = $conn->prepare("SELECT COUNT(*) FROM student WHERE klassekode = ?");
+        $sjekk->bind_param("s", $klassekode);
+        $sjekk->execute();
+        $sjekk->bind_result($antStudenter);
+        $sjekk->fetch();
+        $sjekk->close();
+
+        if ($antStudenter > 0) {
+            $err = "Kan ikke slette klasse fordi det finnes studenter i den.";
+        } else {
+            $stmt = $conn->prepare("DELETE FROM klasse WHERE klassekode = ?");
+            $stmt->bind_param("s", $klassekode);
+            if ($stmt->execute()) {
+                $msg = "Klassen med kode '$klassekode' ble slettet.";
+            } else {
+                $err = "Klarte ikke å slette klassen.";
+            }
+            $stmt->close();
+        }
+    } else {
+        $err = "Du må velge en klasse.";
+    }
+}
 ?>
+
 <!doctype html>
 <html lang="no">
 <head>
@@ -24,13 +78,9 @@ a{color:#2563eb;text-decoration:none}
 <div class="form">
 <h2>Slett klasse</h2>
 
-<?php if (is_object($klasser)): ?>
-    <?php while ($row = $klasser->fetch_assoc()): ?>
-        <option value="<?= htmlspecialchars($row['klassekode']) ?>">
-            <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
-        </option>
-    <?php endwhile; ?>
-<?php else: ?>
+<?php if ($msg): ?>
+    <div class="msg ok"><?= htmlspecialchars($msg) ?></div>
+<?php elseif ($err): ?>
     <div class="msg <?= ($antStudenter ?? 0) > 0 ? 'warn' : 'err' ?>"><?= htmlspecialchars($err) ?></div>
 <?php endif; ?>
 
@@ -38,20 +88,12 @@ a{color:#2563eb;text-decoration:none}
     <label for="klassekode">Velg klasse</label>
     <select id="klassekode" name="klassekode" required>
         <option value="">Velg klasse</option>
-        <?php if ($klasser && ((is_object(value: $klasser) && $klasser->num_rows > 0) || (is_array($klasser) && count($klasser) > 0))): ?>
-            <?php if (is_object(value: $klasser)): ?>
-                <?php while ($row = $klasser->fetch_assoc()): ?>
-                    <option value="<?= htmlspecialchars(string: $row['klassekode']) ?>">
-                        <?= htmlspecialchars(string: $row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
-                    </option>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <?php foreach ($klasser as $row): ?>
-                    <option value="<?= htmlspecialchars(string: $row['klassekode']) ?>">
-                        <?= htmlspecialchars(string: $row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
-                    </option>
-                <?php endforeach; ?>
-            <?php endif; ?>
+        <?php if ($klasser instanceof mysqli_result && $klasser->num_rows > 0): ?>
+            <?php while ($row = $klasser->fetch_assoc()): ?>
+                <option value="<?= htmlspecialchars($row['klassekode']) ?>">
+                    <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
+                </option>
+            <?php endwhile; ?>
         <?php endif; ?>
     </select>
     <button>Slett</button>
