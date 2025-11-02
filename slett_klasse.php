@@ -22,9 +22,13 @@ a{color:#2563eb;text-decoration:none}
 <div class="form">
 <h2>Slett klasse</h2>
 
-<?php if ($msg): ?>
-    <div class="msg ok"><?= htmlspecialchars($msg) ?></div>
-<?php elseif ($err): ?>
+<?php if (is_object($klasser)): ?>
+    <?php while ($row = $klasser->fetch_assoc()): ?>
+        <option value="<?= htmlspecialchars($row['klassekode']) ?>">
+            <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
+        </option>
+    <?php endwhile; ?>
+<?php else: ?>
     <div class="msg <?= ($antStudenter ?? 0) > 0 ? 'warn' : 'err' ?>"><?= htmlspecialchars($err) ?></div>
 <?php endif; ?>
 
