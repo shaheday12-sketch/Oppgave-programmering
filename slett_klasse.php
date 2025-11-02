@@ -5,7 +5,7 @@
 <title>Slett klasse</title>
 <style>
 body{font-family:system-ui,Arial;margin:0;background:#f5f6fa;color:#222;padding:30px}
-form{max-width:420px;margin:auto;background:#fff;border:1px solid #e6e8ec;border-radius:10px;padding:20px 24px;box-shadow:0 2px 5px rgba(0,0,0,.06)}
+.form{max-width:420px;margin:auto;background:#fff;border:1px solid #e6e8ec;border-radius:10px;padding:20px 24px;box-shadow:0 2px 5px rgba(0,0,0,.06)}
 h2{margin:0 0 14px;text-align:center}
 label{display:block;font-weight:600;margin-top:10px}
 select{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-top:6px;font:inherit}
@@ -30,7 +30,7 @@ a{color:#2563eb;text-decoration:none}
 
 <form method="post" onsubmit="return confirm('Slette valgt klasse?')">
     <label for="klassekode">Velg klasse</label>
-    <se lect id="klassekode" name="klassekode" required>
+    <select id="klassekode" name="klassekode" required>
         <option value="">Velg klasse</option>
         <?php if ($klasser && ((is_object(value: $klasser) && $klasser->num_rows > 0) || (is_array($klasser) && count($klasser) > 0))): ?>
             <?php if (is_object(value: $klasser)): ?>
