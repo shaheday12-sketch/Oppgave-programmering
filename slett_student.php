@@ -44,7 +44,7 @@ $antStudenter = 0;
 
 $sql = "SELECT studentnr, fornavn, etternavn FROM student ORDER BY studentnr";  
 
-$resultat = $conn->query($sql);  
+$sql = "DELETE FROM studenten WHERE id = $studentnr";
 
   
 
