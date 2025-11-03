@@ -1,5 +1,5 @@
 <?php
-require_once _DIR_ . '/db.php';
+require_once __DIR__ . '/db.php';
 
 $ok = $err = null;
 
@@ -8,7 +8,7 @@ $sql = "SELECT s.brukernavn, s.fornavn, s.etternavn FROM student s ORDER BY s.br
 $res = $conn->query($sql);
 $studenter = $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') { h
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bn = $_POST['brukernavn'] ?? '';
     if ($bn === '') {
         $err = "Velg en student å slette.";
