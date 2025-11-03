@@ -3,29 +3,50 @@ require_once __DIR__ . '/db.php';
 
 $ok = $err = null;
 
-// til listeboks
-$sql = "SELECT s.brukernavn, s.fornavn, s.etternavn FROM student s ORDER BY s.brukernavn";
+// Henter studenter til listeboksen
+$sql = "SELECT brukernavn, fornavn, etternavn FROM student ORDER BY brukernavn";
 $res = $conn->query($sql);
-$studenter = $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
+
+if (!$res) {
+    die("Feil i SQL-spørringen: " . htmlspecialchars($conn->error));
+}
+
+$studenter = $res->fetch_all(MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bn = $_POST['brukernavn'] ?? '';
-    if ($bn === '') {
+
+    if (trim($bn) === '') {
         $err = "Velg en student å slette.";
     } else {
         $stmt = $conn->prepare("DELETE FROM student WHERE brukernavn = ?");
-        $stmt->bind_param("s", $bn);
-        if ($stmt->execute()) {
-            if ($stmt->affected_rows > 0) $ok = "Student slettet.";
-            else $err = "Fant ikke studenten.";
-        } else {
-            $err = "Ukjent feil under sletting.";
+        if (!$stmt) {
+            die("Feil ved forberedelse av spørring: " . htmlspecialchars($conn->error));
         }
+
+        $stmt->bind_param("s", $bn);
+
+        if ($stmt->execute()) {
+            if ($stmt->affected_rows > 0) {
+                $ok = "Student slettet.";
+            } else {
+                $err = "Fant ikke studenten.";
+            }
+        } else {
+            $err = "Ukjent feil under sletting: " . htmlspecialchars($stmt->error);
+        }
+
         $stmt->close();
     }
+
     // Oppdater listen etter sletting
     $res = $conn->query($sql);
-    $studenter = $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
+    if ($res) {
+        $studenter = $res->fetch_all(MYSQLI_ASSOC);
+    } else {
+        $studenter = [];
+        $err = "Feil under oppdatering av studentlisten: " . htmlspecialchars($conn->error);
+    }
 }
 ?>
 <!doctype html>
@@ -34,13 +55,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="utf-8">
   <title>Slett student</title>
   <style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:2rem;}
-    select,button{padding:.6rem;border-radius:8px;border:1px solid #ccc;min-width:360px}
-    .row{margin:.6rem 0}
-    .msg{padding:.7rem;border-radius:8px;margin:.7rem 0;max-width:520px}
-    .ok{background:#e8f7ee;border:1px solid #9cd7b4}
-    .err{background:#fdeaea;border:1px solid #f2a3a3}
-    a{color:#1a1a1a}
+    body { font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif; margin: 2rem; }
+    select, button { padding: .6rem; border-radius: 8px; border: 1px solid #ccc; min-width: 360px; }
+    .row { margin: .6rem 0; }
+    .msg { padding: .7rem; border-radius: 8px; margin: .7rem 0; max-width: 520px; }
+    .ok { background: #e8f7ee; border: 1px solid #9cd7b4; }
+    .err { background: #fdeaea; border: 1px solid #f2a3a3; }
+    a { color: #1a1a1a; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -56,12 +77,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <option value="">— Velg student —</option>
         <?php foreach ($studenter as $s): ?>
           <option value="<?= htmlspecialchars($s['brukernavn']) ?>">
-            <?= htmlspecialchars($s['brukernavn'].' – '.$s['fornavn'].' '.$s['etternavn']) ?>
+            <?= htmlspecialchars($s['brukernavn'] . ' – ' . $s['fornavn'] . ' ' . $s['etternavn']) ?>
           </option>
         <?php endforeach; ?>
       </select>
     </div>
-    <div class="row"><button type="submit">Slett</button></div>
+    <div class="row">
+      <button type="submit">Slett</button>
+    </div>
   </form>
 </body>
 </html>
