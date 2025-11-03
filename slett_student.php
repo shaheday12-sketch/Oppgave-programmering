@@ -1,107 +1,67 @@
 <?php
-// --- KOBLE TIL DATABASEN ---
-$server = "b-studentsql-1.usn.no";     // endre hvis du bruker annen server
-$bruker = "shayo1243";          // skriv inn brukernavnet ditt
-$passord = "5791shayo1243";             // skriv inn passordet ditt
-$dbnavn = "shayo1243";   
+require_once _DIR_ . '/db.php';
 
-$conn = new mysqli(hostname: $server, username: $bruker, password: $passord, database: $dbnavn);
-if ($conn->connect_error) {
-    die("Feil ved tilkobling: " . $conn->connect_error);
-}
+$ok = $err = null;
 
-// --- DEFINER VARIABLER ---
-$klasser = [];
-$msg = null;
-$err = null;
-$antStudenter = 0;
+// til listeboks
+$sql = "SELECT s.brukernavn, s.fornavn, s.etternavn FROM student s ORDER BY s.brukernavn";
+$res = $conn->query($sql);
+$studenter = $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
 
-// --- HENT STUDENTER FRA DATABASE ---
-$sql = "SELECT klassekode, klassenavn FROM klasse ORDER BY klassekode";
-$resultat = $conn->query($sql);
-if ($resultat && $resultat->num_rows > 0) {
-    $klasser = $resultat;
-}
-
-// --- DEFINER VARIABLER ---
-$studenter = [];
-$msg = null;
-$err = null;
-
-// --- HENT STUDENTER FRA DATABASE ---
-$sql = "SELECT studentnr, navn FROM student ORDER BY studentnr";
-$resultat = $conn->query($sql);
-if ($resultat && $resultat->num_rows > 0) {
-    $studenter = $resultat;
-}
-
-// --- HÅNDTER SLETTING ---
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $studentnr = $_POST["studentnr"] ?? '';
-
-    if ($studentnr !== '') {
-        // Slett studenten direkte
-        $stmt = $conn->prepare("DELETE FROM student WHERE studentnr = ?");
-        $stmt->bind_param("s", $studentnr);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { h
+    $bn = $_POST['brukernavn'] ?? '';
+    if ($bn === '') {
+        $err = "Velg en student å slette.";
+    } else {
+        $stmt = $conn->prepare("DELETE FROM student WHERE brukernavn = ?");
+        $stmt->bind_param("s", $bn);
         if ($stmt->execute()) {
-            $msg = "Studenten med nummer '$studentnr' ble slettet.";
+            if ($stmt->affected_rows > 0) $ok = "Student slettet.";
+            else $err = "Fant ikke studenten.";
         } else {
-            $err = "Klarte ikke å slette studenten.";
+            $err = "Ukjent feil under sletting.";
         }
         $stmt->close();
-    } else {
-        $err = "Du må velge en student.";
     }
+    // Oppdater listen etter sletting
+    $res = $conn->query($sql);
+    $studenter = $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
 }
 ?>
-
-
 <!doctype html>
 <html lang="no">
 <head>
-<meta charset="utf-8">
-<title>Slett klasse</title>
-<style>
-body{font-family:system-ui,Arial;margin:0;background:#f5f6fa;color:#222;padding:30px}
-.form{max-width:420px;margin:auto;background:#fff;border:1px solid #e6e8ec;border-radius:10px;padding:20px 24px;box-shadow:0 2px 5px rgba(0,0,0,.06)}
-h2{margin:0 0 14px;text-align:center}
-label{display:block;font-weight:600;margin-top:10px}
-select{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-top:6px;font:inherit}
-button{width:100%;margin-top:14px;background:#111;color:#fff;border:0;border-radius:8px;padding:10px;font:inherit;cursor:pointer}
-.msg{margin:10px 0;padding:8px;border-radius:6px;text-align:center}
-.ok{background:#e8f5e9;color:#2e7d32}
-.warn{background:#fff3cd;color:#856404}
-.err{background:#fdecea;color:#c62828}
-p.link{text-align:center;margin-top:10px}
-a{color:#2563eb;text-decoration:none}
-</style>
+  <meta charset="utf-8">
+  <title>Slett student</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:2rem;}
+    select,button{padding:.6rem;border-radius:8px;border:1px solid #ccc;min-width:360px}
+    .row{margin:.6rem 0}
+    .msg{padding:.7rem;border-radius:8px;margin:.7rem 0;max-width:520px}
+    .ok{background:#e8f7ee;border:1px solid #9cd7b4}
+    .err{background:#fdeaea;border:1px solid #f2a3a3}
+    a{color:#1a1a1a}
+  </style>
 </head>
 <body>
-<div class="form">
-<h2>Slett klasse</h2>
+  <p><a href="index.php">← Tilbake</a></p>
+  <h1>Slett student</h1>
 
-<?php if ($msg): ?>
-    <div class="msg ok"><?= htmlspecialchars($msg) ?></div>
-<?php elseif ($err): ?>
-    <div class="msg <?= ($antStudenter ?? 0) > 0 ? 'warn' : 'err' ?>"><?= htmlspecialchars($err) ?></div>
-<?php endif; ?>
+  <?php if ($ok): ?><div class="msg ok"><?= htmlspecialchars($ok) ?></div><?php endif; ?>
+  <?php if ($err): ?><div class="msg err"><?= htmlspecialchars($err) ?></div><?php endif; ?>
 
-<form method="post" onsubmit="return confirm('Slette valgt klasse?')">
-    <label for="klassekode">Velg klasse</label>
-    <select id="klassekode" name="klassekode" required>
-        <option value="">Velg klasse</option>
-        <?php if ($klasser instanceof mysqli_result && $klasser->num_rows > 0): ?>
-            <?php while ($row = $klasser->fetch_assoc()): ?>
-                <option value="<?= htmlspecialchars($row['klassekode']) ?>">
-                    <?= htmlspecialchars($row['klassekode']) ?> – <?= htmlspecialchars($row['klassenavn']) ?>
-                </option>
-            <?php endwhile; ?>
-        <?php endif; ?>
-    </select>
-    <button>Slett</button>
-</form>
-
-<p class="link"><a href="index.php">← Tilbake</a></p>
-</div>
+  <form method="post" onsubmit="return confirm('Slette valgt student?')">
+    <div class="row">
+      <select name="brukernavn" required>
+        <option value="">— Velg student —</option>
+        <?php foreach ($studenter as $s): ?>
+          <option value="<?= htmlspecialchars($s['brukernavn']) ?>">
+            <?= htmlspecialchars($s['brukernavn'].' – '.$s['fornavn'].' '.$s['etternavn']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <div class="row"><button type="submit">Slett</button></div>
+  </form>
 </body>
 </html>
